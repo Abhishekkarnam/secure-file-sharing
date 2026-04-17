@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Logs | SecureShare</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-logo"><strong>SECURE_FS</strong></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="upload.html">Upload File</a>
+            <a href="files.html">My Files</a>
+            <a href="attack.html">Attack Simulation</a>
+            <a href="logs.html" class="active" id="nav-logs">Admin Logs</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>System Audit Logs</h2>
+            <p style="color: var(--error); font-size: 0.9rem;">CONFIDENTIAL: Administrator Access Only</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event User</th>
+                            <th>Action</th>
+                            <th>Timestamp</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-table">
+                        <!-- Example Logs -->
+                        <tr>
+                            <td>admin</td>
+                            <td>USER_LOGIN</td>
+                            <td>2023-10-25 14:22:01</td>
+                            <td><span style="color: var(--accent);">SUCCESS</span></td>
+                        </tr>
+                        <tr>
+                            <td>unknown_ip</td>
+                            <td>BRUTE_FORCE_ATTEMPT</td>
+                            <td>2023-10-25 14:25:30</td>
+                            <td><span style="color: var(--error);">BLOCKED</span></td>
+                        </tr>
+                        <tr>
+                            <td>user_01</td>
+                            <td>FILE_DOWNLOAD (Project_X)</td>
+                            <td>2023-10-25 14:30:12</td>
+                            <td><span style="color: var(--accent);">SUCCESS</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="../static/script.js"></script>
+</body>
+</html>

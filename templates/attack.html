@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulation | SecureShare</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-logo"><strong>SECURE_FS</strong></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="upload.html">Upload File</a>
+            <a href="files.html">My Files</a>
+            <a href="attack.html" class="active">Attack Simulation</a>
+            <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Cyber Attack Simulator</h2>
+            <p>Run simulated attacks to test system response and logging capabilities.</p>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 1.5rem 0;">
+                <button onclick="simulateAttack('Unauthorized Access')" style="background: #bd2c00;">Unauthorized Access</button>
+                <button onclick="simulateAttack('MITM Intersection')" style="background: #e36209;">MITM Simulation</button>
+                <button onclick="simulateAttack('Brute Force')" style="background: #6f42c1;">Brute Force</button>
+                <button onclick="document.getElementById('console').innerHTML=''" style="background: var(--secondary);">Clear Console</button>
+            </div>
+
+            <div id="console">
+                <div style="color: #888;">// SecureShare Kernel v1.0.4 - Simulation Engine Ready...</div>
+                <div style="color: #888;">// Monitoring traffic on port 443...</div>
+            </div>
+        </div>
+    </div>
+    <script src="../static/script.js"></script>
+</body>
+</html>

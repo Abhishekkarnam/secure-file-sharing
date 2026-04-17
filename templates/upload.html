@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload | SecureShare</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-logo"><strong>SECURE_FS</strong></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="upload.html" class="active">Upload File</a>
+            <a href="files.html">My Files</a>
+            <a href="attack.html">Attack Simulation</a>
+            <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <h2>Secure File Upload</h2>
+            <p style="color: var(--text-dim);">Files are AES-256 encrypted before storage.</p>
+            <hr style="border: 0; border-top: 1px solid var(--secondary); margin: 1.5rem 0;">
+            
+            <div id="upload-status" class="alert"></div>
+
+            <div style="margin: 2rem 0; border: 2px dashed var(--secondary); padding: 2rem; text-align: center; border-radius: 8px;">
+                <input type="file" id="fileInput" multiple style="margin-bottom: 1rem;">
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Maximum file size: 50MB</p>
+            </div>
+
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+
+            <button onclick="uploadFile()" style="width: 100%;">ENCRYPT & UPLOAD</button>
+        </div>
+    </div>
+    <script src="../static/script.js"></script>
+</body>
+</html>

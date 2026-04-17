@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Files | SecureShare</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-logo"><strong>SECURE_FS</strong></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="upload.html">Upload File</a>
+            <a href="files.html" class="active">My Files</a>
+            <a href="attack.html">Attack Simulation</a>
+            <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Encrypted Vault</h2>
+                <button onclick="location.reload()" style="background: var(--secondary); font-size: 0.8rem;">Refresh</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Upload Date</th>
+                            <th>Owner</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="file-table">
+                        <!-- Example Row -->
+                        <tr>
+                            <td>Project_X_Blueprints.zip.enc</td>
+                            <td>Oct 24, 2023</td>
+                            <td><span class="badge">admin</span></td>
+                            <td><button class="btn-sm" onclick="alert('Requesting Secure Download...')">Download</button></td>
+                        </tr>
+                        <tr>
+                            <td>Credentials.txt.gpg</td>
+                            <td>Oct 25, 2023</td>
+                            <td><span class="badge">sec_user</span></td>
+                            <td><button class="btn-sm" onclick="alert('Requesting Secure Download...')">Download</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="../static/script.js"></script>
+</body>
+</html>
