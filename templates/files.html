@@ -2,58 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Files | SecureShare</title>
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <nav>
-        <div class="nav-logo"><strong>SECURE_FS</strong></div>
-        <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="upload.html">Upload File</a>
-            <a href="files.html" class="active">My Files</a>
-            <a href="attack.html">Attack Simulation</a>
-            <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
-            <a href="#" onclick="logout()">Logout</a>
-        </div>
-    </nav>
+    <div class="app-shell">
+        <nav class="topbar">
+            <div class="topbar-inner">
+                <a class="brand" href="dashboard.html">
+                    <span class="brand-mark">SF</span>
+                    <span class="brand-copy">
+                        <span class="brand-title">SecureShare</span>
+                        <span class="brand-subtitle">Premium Secure Workspace</span>
+                    </span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="upload.html">Upload File</a>
+                    <a href="files.html" class="active">My Files</a>
+                    <a href="attack.html">Attack Simulation</a>
+                    <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
+                    <a href="#" class="logout-link" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </nav>
 
-    <div class="container">
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2>Encrypted Vault</h2>
-                <button onclick="location.reload()" style="background: var(--secondary); font-size: 0.8rem;">Refresh</button>
-            </div>
-            
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>File Name</th>
-                            <th>Upload Date</th>
-                            <th>Owner</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="file-table">
-                        <!-- Example Row -->
-                        <tr>
-                            <td>Project_X_Blueprints.zip.enc</td>
-                            <td>Oct 24, 2023</td>
-                            <td><span class="badge">admin</span></td>
-                            <td><button class="btn-sm" onclick="alert('Requesting Secure Download...')">Download</button></td>
-                        </tr>
-                        <tr>
-                            <td>Credentials.txt.gpg</td>
-                            <td>Oct 25, 2023</td>
-                            <td><span class="badge">sec_user</span></td>
-                            <td><button class="btn-sm" onclick="alert('Requesting Secure Download...')">Download</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <main class="page">
+            <section class="content-grid">
+                <article class="card span-12 table-card">
+                    <div class="table-head">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <p class="eyebrow">Encrypted Vault</p>
+                                <h2>Protected file inventory</h2>
+                                <p>Search and scan your encrypted library faster with richer row design and clearer metadata.</p>
+                            </div>
+                            <div class="action-row">
+                                <span class="chip">Visible files: <strong id="vault-count">0</strong></span>
+                                <button class="secondary" onclick="loadFiles()">Refresh</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-toolbar">
+                        <div class="search-shell">
+                            <span class="search-icon">SR</span>
+                            <input type="text" id="file-search" placeholder="Search by file name" oninput="filterFiles()">
+                        </div>
+                        <div class="chip-row">
+                            <span class="chip">Secure retrieval only</span>
+                            <span class="chip">Live backend inventory</span>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>File</th>
+                                    <th>Upload Date</th>
+                                    <th>Owner</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="file-table">
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="empty-state">
+                                            <strong>Loading vault data</strong>
+                                            <p>The live encrypted file list will appear here in a moment.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+        </main>
     </div>
+    <div id="toast-stack" class="toast-stack"></div>
     <script src="../static/script.js"></script>
 </body>
 </html>

@@ -1,20 +1,62 @@
 const API_BASE = "http://127.0.0.1:5000";
 
-/**
- * HELPER: Get the JWT token from localStorage
- */
 const getAuthHeader = () => {
     const token = localStorage.getItem('token');
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
-// --- 👤 AUTHENTICATION ---
+let cachedFiles = [];
+
+const formatRelativeTime = (dateString) => {
+    if (!dateString) return "No uploads yet";
+    const now = Date.now();
+    const target = new Date(dateString).getTime();
+    const diffMs = now - target;
+    if (Number.isNaN(target) || diffMs < 0) return "Just now";
+
+    const diffMinutes = Math.floor(diffMs / 60000);
+    if (diffMinutes < 1) return "Just now";
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+};
+
+const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+}[char]));
+
+const getFileExtension = (filename) => {
+    const parts = String(filename).split('.');
+    return parts.length > 1 ? parts.pop().toUpperCase() : 'FILE';
+};
+
+const showToast = (message, type = "success") => {
+    const stack = document.getElementById('toast-stack');
+    if (!stack) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type === 'error' ? 'error-toast' : 'success-toast'}`;
+    toast.innerText = message;
+    stack.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2600);
+};
+
 async function handleLogin(e) {
     e.preventDefault();
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
 
-    // 1. Ensure the URL is /auth/login
     const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -23,8 +65,7 @@ async function handleLogin(e) {
 
     const data = await response.json();
     if (response.ok) {
-        // 2. Use access_token (matching your Python code)
-        localStorage.setItem('token', data.access_token); 
+        localStorage.setItem('token', data.access_token);
         localStorage.setItem('username', data.username);
         localStorage.setItem('role', data.role);
         window.location.href = 'dashboard.html';
@@ -35,29 +76,30 @@ async function handleLogin(e) {
     }
 }
 
-// --- 📁 FILE UPLOAD (with JWT) ---
 function uploadFile() {
     const fileInput = document.getElementById('fileInput');
     const status = document.getElementById('upload-status');
     const progBar = document.getElementById('progress-bar');
+    const progressContainer = document.querySelector('.progress-container');
+    const selectedFileLabel = document.getElementById('selected-file-label');
 
-    if (!fileInput.files[0]) return alert("Select a file first");
+    if (!fileInput.files[0]) {
+        showToast("Select a file first.", "error");
+        return;
+    }
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
 
     const xhr = new XMLHttpRequest();
-    // Path updated to match file_bp (URL prefix: /files)
     xhr.open("POST", `${API_BASE}/files/upload`, true);
-    
-    // IMPORTANT: Include the JWT Token
     xhr.setRequestHeader("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
-    document.querySelector('.progress-container').style.display = 'block';
+    progressContainer.style.display = 'block';
 
     xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
-            progBar.style.width = (e.loaded / e.total * 100) + "%";
+            progBar.style.width = `${(e.loaded / e.total) * 100}%`;
         }
     };
 
@@ -66,17 +108,60 @@ function uploadFile() {
         const res = JSON.parse(xhr.responseText);
         if (xhr.status === 200) {
             status.className = "alert success";
-            status.innerText = "File Encrypted & Stored Successfully!";
+            status.innerText = "File encrypted and stored successfully.";
+            showToast("Upload completed successfully.");
             fileInput.value = "";
+            progBar.style.width = "0%";
+            progressContainer.style.display = 'none';
+            if (selectedFileLabel) {
+                selectedFileLabel.innerText = "Nothing selected yet. Choose a file to begin the protected upload flow.";
+            }
         } else {
             status.className = "alert error";
             status.innerText = res.msg || "Upload failed.";
+            showToast(res.msg || "Upload failed.", "error");
         }
     };
+
     xhr.send(formData);
 }
 
-// --- 📊 DATA LOADING (with JWT) ---
+function renderFilesTable(files) {
+    const tableBody = document.getElementById('file-table');
+    if (!tableBody) return;
+
+    if (!files.length) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    <div class="empty-state">
+                        <strong>No encrypted files yet</strong>
+                        <p>Upload your first file to populate the secure vault.</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tableBody.innerHTML = files.map((file) => `
+        <tr>
+            <td>
+                <div class="file-main">
+                    <span class="file-type">${escapeHtml(getFileExtension(file.filename))}</span>
+                    <div>
+                        <strong>${escapeHtml(file.filename)}</strong>
+                        <span class="muted">Protected item ready for secure retrieval</span>
+                    </div>
+                </div>
+            </td>
+            <td>${new Date(file.date).toLocaleString()}</td>
+            <td><span class="badge">User ${escapeHtml(file.owner)}</span></td>
+            <td><button onclick='downloadFile(${JSON.stringify(encodeURIComponent(file.filename))})'>Download</button></td>
+        </tr>
+    `).join('');
+}
+
 async function loadFiles() {
     const tableBody = document.getElementById('file-table');
     if (!tableBody) return;
@@ -85,20 +170,131 @@ async function loadFiles() {
         const res = await fetch(`${API_BASE}/files/list`, {
             headers: getAuthHeader()
         });
-        
-        if (res.status === 401) return logout(); // Token expired
 
-        const files = await res.json();
-        tableBody.innerHTML = files.map(f => `
-            <tr>
-                <td>${f.filename}</td>
-                <td>${new Date(f.date).toLocaleString()}</td>
-                <td><span class="badge">${f.owner}</span></td>
-                <td><button class="btn-sm" onclick='downloadFile(${JSON.stringify(encodeURIComponent(f.filename))})'>Download</button></td>
-            </tr>
-        `).join('');
+        if (res.status === 401) return logout();
+
+        cachedFiles = await res.json();
+        const countBadge = document.getElementById('vault-count');
+        if (countBadge) countBadge.innerText = cachedFiles.length;
+        renderFilesTable(cachedFiles);
     } catch (err) {
         console.error("Error loading files:", err);
+        showToast("Unable to load vault data.", "error");
+    }
+}
+
+function filterFiles() {
+    const searchInput = document.getElementById('file-search');
+    if (!searchInput) return;
+
+    const query = searchInput.value.trim().toLowerCase();
+    const filteredFiles = cachedFiles.filter((file) =>
+        String(file.filename).toLowerCase().includes(query)
+    );
+
+    const countBadge = document.getElementById('vault-count');
+    if (countBadge) countBadge.innerText = filteredFiles.length;
+
+    renderFilesTable(filteredFiles);
+}
+
+async function loadDashboard() {
+    const totalFilesEl = document.getElementById('quick-files-count');
+    if (!totalFilesEl) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/files/list`, {
+            headers: getAuthHeader()
+        });
+
+        if (res.status === 401) return logout();
+
+        const files = await res.json();
+        const sortedFiles = [...files].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const last24Hours = Date.now() - (24 * 60 * 60 * 1000);
+        const recentUploads = sortedFiles.filter((file) => new Date(file.date).getTime() >= last24Hours);
+        const latestFile = sortedFiles[0];
+        const role = localStorage.getItem('role') || 'user';
+
+        totalFilesEl.innerText = sortedFiles.length;
+        document.getElementById('recent-upload-count').innerText = recentUploads.length;
+        document.getElementById('latest-activity').innerText = latestFile ? formatRelativeTime(latestFile.date) : "No uploads yet";
+        document.getElementById('dashboard-total-files').innerText = sortedFiles.length;
+        document.getElementById('dashboard-recent-files').innerText = recentUploads.length;
+        document.getElementById('dashboard-last-upload').innerText = latestFile ? latestFile.filename : "None";
+        document.getElementById('security-status').innerText = sortedFiles.length ? "Vault synced with latest encrypted records" : "Ready for the first secure upload";
+
+        const heroRoleBadge = document.getElementById('hero-role-badge');
+        if (heroRoleBadge) {
+            heroRoleBadge.innerText = `${role.toUpperCase()} SESSION`;
+            heroRoleBadge.classList.toggle('admin', role === 'admin');
+        }
+
+        const dashboardLogLink = document.getElementById('dashboard-log-link');
+        if (dashboardLogLink && role === 'admin') {
+            dashboardLogLink.style.display = 'inline-flex';
+        }
+
+        const fileList = document.getElementById('dashboard-file-list');
+        if (fileList) {
+            if (!sortedFiles.length) {
+                fileList.innerHTML = `
+                    <div class="empty-state">
+                        <strong>Your vault is empty</strong>
+                        <p>Upload a file to see live stats and recent activity update here.</p>
+                    </div>
+                `;
+            } else {
+                fileList.innerHTML = sortedFiles.slice(0, 4).map((file) => `
+                    <div class="list-item">
+                        <div class="file-main">
+                            <span class="file-type">${escapeHtml(getFileExtension(file.filename))}</span>
+                            <div>
+                                <strong>${escapeHtml(file.filename)}</strong>
+                                <span class="muted">Uploaded ${new Date(file.date).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <span class="badge">${formatRelativeTime(file.date)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        const dashboardTimeline = document.getElementById('dashboard-timeline');
+        if (dashboardTimeline) {
+            const timelineEntries = [
+                {
+                    title: role === 'admin' ? 'Administrator session active' : 'User session active',
+                    detail: `Signed in as ${role} and ready for secure file operations.`
+                },
+                latestFile ? {
+                    title: `Latest vault update: ${latestFile.filename}`,
+                    detail: `Most recent upload recorded ${formatRelativeTime(latestFile.date)}.`
+                } : {
+                    title: 'Vault awaiting first upload',
+                    detail: 'Add a protected file to begin activity tracking.'
+                },
+                {
+                    title: `${recentUploads.length} upload(s) in the last 24 hours`,
+                    detail: sortedFiles.length
+                        ? 'Recent encrypted activity is reflected in your dashboard metrics.'
+                        : 'No recent activity yet. Upload a file to start populating the vault.'
+                }
+            ];
+
+            dashboardTimeline.innerHTML = timelineEntries.map((entry) => `
+                <div class="timeline-item">
+                    <span class="timeline-dot"></span>
+                    <div class="timeline-card">
+                        <strong>${escapeHtml(entry.title)}</strong>
+                        <span class="muted">${escapeHtml(entry.detail)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (err) {
+        console.error("Error loading dashboard stats:", err);
+        showToast("Unable to load dashboard stats.", "error");
     }
 }
 
@@ -112,7 +308,7 @@ async function downloadFile(encodedFilename) {
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({ msg: "Download failed." }));
-            alert(error.msg || "Download failed.");
+            showToast(error.msg || "Download failed.", "error");
             return;
         }
 
@@ -127,9 +323,10 @@ async function downloadFile(encodedFilename) {
         link.click();
         link.remove();
         window.URL.revokeObjectURL(downloadUrl);
+        showToast(`Downloaded ${decodedFilename}.`);
     } catch (err) {
         console.error("Error downloading file:", err);
-        alert("Unable to download file right now.");
+        showToast("Unable to download file right now.", "error");
     }
 }
 
@@ -138,7 +335,6 @@ async function loadLogs() {
     if (!tableBody) return;
 
     try {
-        // Path updated to /logs/all (Admin only)
         const res = await fetch(`${API_BASE}/logs/all`, {
             headers: getAuthHeader()
         });
@@ -149,20 +345,20 @@ async function loadLogs() {
         }
 
         const logs = await res.json();
-        tableBody.innerHTML = logs.map(l => `
+        tableBody.innerHTML = logs.map((log) => `
             <tr>
-                <td>${l.user_id}</td>
-                <td>${l.action}</td>
-                <td>${new Date(l.timestamp).toLocaleString()}</td>
-                <td><span style="color: ${l.status === 'SUCCESS' ? 'var(--accent)' : 'var(--error)'}">${l.status}</span></td>
+                <td>${escapeHtml(log.user_id)}</td>
+                <td>${escapeHtml(log.action)}</td>
+                <td>${new Date(log.timestamp).toLocaleString()}</td>
+                <td><span class="badge">${escapeHtml(log.status)}</span></td>
             </tr>
         `).join('');
     } catch (err) {
         console.error("Error loading logs:", err);
+        showToast("Unable to load admin logs.", "error");
     }
 }
 
-// --- 🚨 ATTACK SIMULATION ---
 function simulateAttack(type) {
     const consoleBox = document.getElementById('console');
     const logLine = (msg) => {
@@ -172,47 +368,79 @@ function simulateAttack(type) {
         consoleBox.scrollTop = consoleBox.scrollHeight;
     };
 
-    logLine(`Starting ${type} Simulation...`);
-    
-    // Call the backend to record the "attack" in the security logs
+    logLine(`Starting ${type} simulation...`);
+
     fetch(`${API_BASE}/attacks/simulate`, {
         method: 'POST',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
-            ...getAuthHeader() 
+            ...getAuthHeader()
         },
         body: JSON.stringify({ attack_type: type })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
         setTimeout(() => logLine(`Result: ${data.result}`), 1000);
-        setTimeout(() => logLine(`System Status: Logged and Blocked.`), 1800);
+        setTimeout(() => logLine("System Status: Logged and blocked."), 1800);
     });
 }
 
-// --- ⚙️ AUTO-LOAD ON PAGE ARRIVAL ---
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-    
-    // Redirect to login if no token found
+
     if (!token && !window.location.pathname.includes('login.html')) {
         window.location.href = 'login.html';
     }
 
-    // Load data based on page
     if (window.location.pathname.includes('files.html')) loadFiles();
+    if (window.location.pathname.includes('dashboard.html')) loadDashboard();
     if (window.location.pathname.includes('logs.html')) loadLogs();
-    
-    // Display Username
+
     const userDisplay = document.getElementById('user-welcome');
     if (userDisplay) {
-        userDisplay.innerText = `Welcome, ${localStorage.getItem('username')} [${localStorage.getItem('role')}]`;
+        userDisplay.innerText = `Welcome back, ${localStorage.getItem('username')}`;
     }
 
-    // Admin-only Link Logic
     const logNav = document.getElementById('nav-logs');
     if (logNav && localStorage.getItem('role') !== 'admin') {
         logNav.style.display = 'none';
+    }
+
+    const fileInput = document.getElementById('fileInput');
+    const selectedFileLabel = document.getElementById('selected-file-label');
+    if (fileInput && selectedFileLabel) {
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            selectedFileLabel.innerText = file
+                ? `Selected file: ${file.name}`
+                : "Nothing selected yet. Choose a file to begin the protected upload flow.";
+        });
+    }
+
+    const dropzone = document.getElementById('upload-dropzone');
+    if (dropzone && fileInput) {
+        ['dragenter', 'dragover'].forEach((eventName) => {
+            dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dropzone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach((eventName) => {
+            dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                dropzone.classList.remove('drag-over');
+            });
+        });
+
+        dropzone.addEventListener('drop', (event) => {
+            const droppedFiles = event.dataTransfer.files;
+            if (!droppedFiles.length) return;
+            fileInput.files = droppedFiles;
+            if (selectedFileLabel) {
+                selectedFileLabel.innerText = `Selected file: ${droppedFiles[0].name}`;
+            }
+        });
     }
 });
 

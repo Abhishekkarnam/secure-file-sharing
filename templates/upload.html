@@ -2,42 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload | SecureShare</title>
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <nav>
-        <div class="nav-logo"><strong>SECURE_FS</strong></div>
-        <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="upload.html" class="active">Upload File</a>
-            <a href="files.html">My Files</a>
-            <a href="attack.html">Attack Simulation</a>
-            <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
-            <a href="#" onclick="logout()">Logout</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="card" style="max-width: 600px; margin: 0 auto;">
-            <h2>Secure File Upload</h2>
-            <p style="color: var(--text-dim);">Files are AES-256 encrypted before storage.</p>
-            <hr style="border: 0; border-top: 1px solid var(--secondary); margin: 1.5rem 0;">
-            
-            <div id="upload-status" class="alert"></div>
-
-            <div style="margin: 2rem 0; border: 2px dashed var(--secondary); padding: 2rem; text-align: center; border-radius: 8px;">
-                <input type="file" id="fileInput" multiple style="margin-bottom: 1rem;">
-                <p style="font-size: 0.8rem; color: var(--text-dim);">Maximum file size: 50MB</p>
+    <div class="app-shell">
+        <nav class="topbar">
+            <div class="topbar-inner">
+                <a class="brand" href="dashboard.html">
+                    <span class="brand-mark">SF</span>
+                    <span class="brand-copy">
+                        <span class="brand-title">SecureShare</span>
+                        <span class="brand-subtitle">Premium Secure Workspace</span>
+                    </span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="upload.html" class="active">Upload File</a>
+                    <a href="files.html">My Files</a>
+                    <a href="attack.html">Attack Simulation</a>
+                    <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
+                    <a href="#" class="logout-link" onclick="logout()">Logout</a>
+                </div>
             </div>
+        </nav>
 
-            <div class="progress-container">
-                <div id="progress-bar"></div>
-            </div>
+        <main class="page">
+            <section class="content-grid">
+                <article class="card span-7">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Secure Intake</p>
+                            <h2>Upload a file into the encrypted vault</h2>
+                            <p>The upload area now has a cleaner premium look, drag-and-drop support, and clearer feedback while the encryption flow runs.</p>
+                        </div>
+                    </div>
 
-            <button onclick="uploadFile()" style="width: 100%;">ENCRYPT & UPLOAD</button>
-        </div>
+                    <div id="upload-status" class="alert"></div>
+
+                    <div class="dropzone" id="upload-dropzone">
+                        <label class="sr-only" for="fileInput">Choose file</label>
+                        <input type="file" id="fileInput" multiple>
+                        <h3 class="dropzone-title">Drop files here or choose from your device</h3>
+                        <p class="helper-text" id="selected-file-label">Nothing selected yet. Choose a file to begin the protected upload flow.</p>
+                        <div class="dropzone-meta">
+                            <span class="chip">Server limit: <strong>16 MB</strong></span>
+                            <span class="chip">Storage: <strong>Encrypted bytes only</strong></span>
+                            <span class="chip">Flow: <strong>AES + RSA</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div id="progress-bar"></div>
+                    </div>
+
+                    <div class="action-row" style="margin-top: 20px;">
+                        <button onclick="uploadFile()">Encrypt and Upload</button>
+                        <a class="button-link ghost" href="files.html">See Vault Contents</a>
+                    </div>
+                </article>
+
+                <aside class="card span-5">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Flow Overview</p>
+                            <h3>What happens after you upload</h3>
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="subtle-panel">
+                            <strong>1. File payload</strong>
+                            <span class="muted">A fresh AES key encrypts the content.</span>
+                        </div>
+                        <div class="subtle-panel">
+                            <strong>2. Key wrapping</strong>
+                            <span class="muted">The AES key is wrapped with RSA before storage.</span>
+                        </div>
+                        <div class="subtle-panel">
+                            <strong>3. Metadata update</strong>
+                            <span class="muted">The vault record is updated live for retrieval.</span>
+                        </div>
+                        <div class="subtle-panel">
+                            <strong>4. Secure download</strong>
+                            <span class="muted">The file is reconstructed only during authorized download.</span>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+        </main>
     </div>
+    <div id="toast-stack" class="toast-stack"></div>
     <script src="../static/script.js"></script>
 </body>
 </html>

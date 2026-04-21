@@ -7,38 +7,164 @@
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <nav>
-        <div class="nav-logo"><strong>SECURE_FS</strong></div>
-        <div class="nav-links">
-            <a href="dashboard.html" class="active">Dashboard</a>
-            <a href="upload.html">Upload File</a>
-            <a href="files.html">My Files</a>
-            <a href="attack.html">Attack Simulation</a>
-            <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
-            <a href="#" onclick="logout()" style="color: var(--error); margin-left: 20px;">Logout</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <header style="margin-bottom: 2rem;">
-            <h1 id="user-welcome">Loading...</h1>
-            <p style="color: var(--text-dim);">System Status: <span style="color: var(--accent);">● Encrypted & Operational</span></p>
-        </header>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-            <div class="card">
-                <h3>Quick Stats</h3>
-                <p>Files Shared: <strong>12</strong></p>
-                <p>Threats Blocked: <strong style="color: var(--accent);">45</strong></p>
-                <button onclick="location.href='files.html'">View My Files</button>
+    <div class="app-shell">
+        <nav class="topbar">
+            <div class="topbar-inner">
+                <a class="brand" href="dashboard.html">
+                    <span class="brand-mark">SF</span>
+                    <span class="brand-copy">
+                        <span class="brand-title">SecureShare</span>
+                        <span class="brand-subtitle">Premium Secure Workspace</span>
+                    </span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html" class="active">Dashboard</a>
+                    <a href="upload.html">Upload File</a>
+                    <a href="files.html">My Files</a>
+                    <a href="attack.html">Attack Simulation</a>
+                    <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
+                    <a href="#" class="logout-link" onclick="logout()">Logout</a>
+                </div>
             </div>
-            <div class="card">
-                <h3>Security Tip</h3>
-                <p style="font-style: italic; color: var(--text-dim);">"Always verify the recipient's identity before sharing sensitive encrypted keys."</p>
-                <button onclick="location.href='attack.html'" style="background: var(--secondary);">Run Diagnostics</button>
-            </div>
-        </div>
+        </nav>
+
+        <main class="page">
+            <section class="hero">
+                <div class="hero-panel">
+                    <span class="hero-kicker"><span class="status-dot"></span> Premium encrypted workspace</span>
+                    <h1 id="user-welcome">Loading secure workspace...</h1>
+                    <p>Run your secure file operations from a calmer, premium control surface with live activity, quick actions, and clearer operational feedback.</p>
+                    <div class="hero-actions">
+                        <a class="button-link" href="upload.html">Upload Secure File</a>
+                        <a class="button-link secondary" href="files.html">Browse Vault</a>
+                    </div>
+                    <div class="chip-row" style="margin-top: 20px;">
+                        <span class="chip">Payload security: <strong>AES-256</strong></span>
+                        <span class="chip">Key wrapping: <strong>RSA</strong></span>
+                        <span class="role-badge" id="hero-role-badge">Role Loading</span>
+                    </div>
+                </div>
+
+                <aside class="stats-panel">
+                    <div>
+                        <p class="eyebrow">Quick Stats</p>
+                        <div class="metric-value" id="quick-files-count">0</div>
+                        <div class="metric-label">files actively secured in your vault</div>
+                    </div>
+                    <div class="mini-stat-grid">
+                        <div class="mini-stat">
+                            <span class="metric-label">Uploads in 24h</span>
+                            <strong id="recent-upload-count">0</strong>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="metric-label">Latest activity</span>
+                            <strong id="latest-activity">No uploads yet</strong>
+                        </div>
+                    </div>
+                    <div class="status-pill">
+                        <span class="status-dot"></span>
+                        <span id="security-status">Encrypted and operational</span>
+                    </div>
+                </aside>
+            </section>
+
+            <section class="content-grid">
+                <article class="card span-8">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Overview</p>
+                            <h2>Live vault snapshot</h2>
+                            <p class="section-copy">The dashboard now shows live counts, recency, and the current most recent file instead of static placeholders.</p>
+                        </div>
+                    </div>
+                    <div class="metric-strip">
+                        <div class="metric-card">
+                            <span class="metric-label">Files in vault</span>
+                            <span class="value" id="dashboard-total-files">0</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Recent uploads</span>
+                            <span class="value" id="dashboard-recent-files">0</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Last file added</span>
+                            <span class="value" id="dashboard-last-upload">None</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card span-4">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Action Center</p>
+                            <h3>Fast next steps</h3>
+                            <p>Jump directly into the tasks that matter most after login.</p>
+                        </div>
+                    </div>
+                    <div class="list">
+                        <div class="list-item">
+                            <div class="file-main">
+                                <span class="icon">UP</span>
+                                <div>
+                                    <strong>Send new protected file</strong>
+                                    <span class="muted">Use the premium upload flow.</span>
+                                </div>
+                            </div>
+                            <a class="button-link secondary" href="upload.html">Open</a>
+                        </div>
+                        <div class="list-item">
+                            <div class="file-main">
+                                <span class="icon">VT</span>
+                                <div>
+                                    <strong>Inspect your vault</strong>
+                                    <span class="muted">Search, filter, and download.</span>
+                                </div>
+                            </div>
+                            <a class="button-link ghost" href="files.html">Browse</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card span-6">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Recent Files</p>
+                            <h3>Latest protected items</h3>
+                            <p>The most recent uploads appear here so you can verify the vault is updating in real time.</p>
+                        </div>
+                        <a class="button-link secondary" href="files.html">View All</a>
+                    </div>
+                    <div id="dashboard-file-list" class="list">
+                        <div class="empty-state">
+                            <strong>No files loaded yet</strong>
+                            <p>Your recent activity will appear here after the dashboard fetches live data.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card span-6">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Activity Timeline</p>
+                            <h3>Session and vault highlights</h3>
+                            <p>A cleaner timeline view makes recent system behavior easier to scan.</p>
+                        </div>
+                        <a class="button-link ghost" href="logs.html" id="dashboard-log-link" style="display:none;">Review Logs</a>
+                    </div>
+                    <div id="dashboard-timeline" class="timeline">
+                        <div class="timeline-item">
+                            <span class="timeline-dot"></span>
+                            <div class="timeline-card">
+                                <strong>Preparing live activity</strong>
+                                <span class="muted">Timeline entries will appear after the dashboard loads.</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </main>
     </div>
+    <div id="toast-stack" class="toast-stack"></div>
     <script src="../static/script.js"></script>
 </body>
 </html>

@@ -2,39 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulation | SecureShare</title>
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <nav>
-        <div class="nav-logo"><strong>SECURE_FS</strong></div>
-        <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="upload.html">Upload File</a>
-            <a href="files.html">My Files</a>
-            <a href="attack.html" class="active">Attack Simulation</a>
-            <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
-            <a href="#" onclick="logout()">Logout</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="card">
-            <h2>Cyber Attack Simulator</h2>
-            <p>Run simulated attacks to test system response and logging capabilities.</p>
-            
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 1.5rem 0;">
-                <button onclick="simulateAttack('Unauthorized Access')" style="background: #bd2c00;">Unauthorized Access</button>
-                <button onclick="simulateAttack('MITM Intersection')" style="background: #e36209;">MITM Simulation</button>
-                <button onclick="simulateAttack('Brute Force')" style="background: #6f42c1;">Brute Force</button>
-                <button onclick="document.getElementById('console').innerHTML=''" style="background: var(--secondary);">Clear Console</button>
+    <div class="app-shell">
+        <nav class="topbar">
+            <div class="topbar-inner">
+                <a class="brand" href="dashboard.html">
+                    <span class="brand-mark">SF</span>
+                    <span class="brand-copy">
+                        <span class="brand-title">SecureShare</span>
+                        <span class="brand-subtitle">Hybrid Encryption Vault</span>
+                    </span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="upload.html">Upload File</a>
+                    <a href="files.html">My Files</a>
+                    <a href="attack.html" class="active">Attack Simulation</a>
+                    <a href="logs.html" id="nav-logs" style="display:none;">Admin Logs</a>
+                    <a href="#" class="logout-link" onclick="logout()">Logout</a>
+                </div>
             </div>
+        </nav>
 
-            <div id="console">
-                <div style="color: #888;">// SecureShare Kernel v1.0.4 - Simulation Engine Ready...</div>
-                <div style="color: #888;">// Monitoring traffic on port 443...</div>
-            </div>
-        </div>
+        <main class="page">
+            <section class="content-grid">
+                <article class="card span-5">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Simulation Lab</p>
+                            <h2>Trigger controlled attack scenarios</h2>
+                            <p>Use these actions to validate monitoring, event logging, and recovery feedback inside the secure interface.</p>
+                        </div>
+                    </div>
+                    <div class="button-row">
+                        <button class="danger" onclick="simulateAttack('Unauthorized Access')">Unauthorized Access</button>
+                        <button class="secondary" onclick="simulateAttack('MITM Intersection')">MITM Simulation</button>
+                        <button class="secondary" onclick="simulateAttack('Brute Force')">Brute Force</button>
+                        <button class="ghost" onclick="document.getElementById('console').innerHTML=''">Clear Console</button>
+                    </div>
+                </article>
+
+                <article class="card span-7">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <p class="eyebrow">Live Console</p>
+                            <h3>Simulation output</h3>
+                            <p>Run a scenario and watch the dashboard-style console update with time-stamped events.</p>
+                        </div>
+                    </div>
+                    <div id="console">
+                        <div class="console-intro">// SecureShare simulation engine ready...</div>
+                        <div class="console-intro">// Monitoring encrypted workflows and log reactions...</div>
+                    </div>
+                </article>
+            </section>
+        </main>
     </div>
     <script src="../static/script.js"></script>
 </body>

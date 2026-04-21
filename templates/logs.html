@@ -2,61 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Logs | SecureShare</title>
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <nav>
-        <div class="nav-logo"><strong>SECURE_FS</strong></div>
-        <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="upload.html">Upload File</a>
-            <a href="files.html">My Files</a>
-            <a href="attack.html">Attack Simulation</a>
-            <a href="logs.html" class="active" id="nav-logs">Admin Logs</a>
-            <a href="#" onclick="logout()">Logout</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="card">
-            <h2>System Audit Logs</h2>
-            <p style="color: var(--error); font-size: 0.9rem;">CONFIDENTIAL: Administrator Access Only</p>
-            
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Event User</th>
-                            <th>Action</th>
-                            <th>Timestamp</th>
-                            <th>Result</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logs-table">
-                        <!-- Example Logs -->
-                        <tr>
-                            <td>admin</td>
-                            <td>USER_LOGIN</td>
-                            <td>2023-10-25 14:22:01</td>
-                            <td><span style="color: var(--accent);">SUCCESS</span></td>
-                        </tr>
-                        <tr>
-                            <td>unknown_ip</td>
-                            <td>BRUTE_FORCE_ATTEMPT</td>
-                            <td>2023-10-25 14:25:30</td>
-                            <td><span style="color: var(--error);">BLOCKED</span></td>
-                        </tr>
-                        <tr>
-                            <td>user_01</td>
-                            <td>FILE_DOWNLOAD (Project_X)</td>
-                            <td>2023-10-25 14:30:12</td>
-                            <td><span style="color: var(--accent);">SUCCESS</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div class="app-shell">
+        <nav class="topbar">
+            <div class="topbar-inner">
+                <a class="brand" href="dashboard.html">
+                    <span class="brand-mark">SF</span>
+                    <span class="brand-copy">
+                        <span class="brand-title">SecureShare</span>
+                        <span class="brand-subtitle">Hybrid Encryption Vault</span>
+                    </span>
+                </a>
+                <div class="nav-links">
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="upload.html">Upload File</a>
+                    <a href="files.html">My Files</a>
+                    <a href="attack.html">Attack Simulation</a>
+                    <a href="logs.html" class="active" id="nav-logs">Admin Logs</a>
+                    <a href="#" class="logout-link" onclick="logout()">Logout</a>
+                </div>
             </div>
-        </div>
+        </nav>
+
+        <main class="page">
+            <section class="content-grid">
+                <article class="card span-12 table-card">
+                    <div class="table-head">
+                        <div class="card-header">
+                            <div class="card-title-group">
+                                <p class="eyebrow">Admin View</p>
+                                <h2>System audit logs</h2>
+                                <p>Confidential event history for privileged review of access, downloads, and simulated threat activity.</p>
+                            </div>
+                            <span class="chip">Administrator access only</span>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event User</th>
+                                    <th>Action</th>
+                                    <th>Timestamp</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table">
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="empty-state">
+                                            <strong>Loading audit trail</strong>
+                                            <p>The latest admin-visible events will appear here once fetched.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+        </main>
     </div>
     <script src="../static/script.js"></script>
 </body>
