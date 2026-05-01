@@ -1,0 +1,14 @@
+$kind: http-request
+name: http://127.0.0.1:5000/auth/login
+url: http://127.0.0.1:5000/auth/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"username\": \"admin\",\r
+
+    \  \"password\": \"password124\"\r
+
+    }\r\n"
+order: 4180355166765414

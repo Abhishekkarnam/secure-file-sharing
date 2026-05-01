@@ -1,0 +1,5 @@
+$kind: http-request
+name: GET http://127.0.0.1:5000/files/list
+url: http://127.0.0.1:5000/files/list
+method: GET
+order: 4485580407568638

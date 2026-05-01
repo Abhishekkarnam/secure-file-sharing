@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'List Files'
+method: GET
+url: '{{base_url}}/files/list'
+order: 5000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{access_token}}'

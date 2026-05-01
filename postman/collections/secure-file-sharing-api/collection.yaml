@@ -1,0 +1,3 @@
+version: v3
+$kind: collection
+name: 'Secure File Sharing API'

@@ -1,0 +1,8 @@
+$kind: http-request
+name: "\thttp://127.0.0.1:5000/files/upload"
+url: "\thttp://127.0.0.1:5000/files/upload"
+method: POST
+body:
+  type: json
+  content: ""
+order: 4349869464495892
