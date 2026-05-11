@@ -378,10 +378,18 @@ function simulateAttack(type) {
         },
         body: JSON.stringify({ attack_type: type })
     })
-    .then((res) => res.json())
+    .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.result || data.msg || "Simulation failed.");
+        return data;
+    })
     .then((data) => {
         setTimeout(() => logLine(`Result: ${data.result}`), 1000);
+        setTimeout(() => logLine(`Severity: ${data.severity} | Status: ${data.status}`), 1400);
         setTimeout(() => logLine("System Status: Logged and blocked."), 1800);
+    })
+    .catch((err) => {
+        setTimeout(() => logLine(`Simulation error: ${err.message}`), 1000);
     });
 }
 
